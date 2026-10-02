@@ -3,6 +3,7 @@ use std::time::Instant;
 use std::path::Path; 
 use std::env; 
 use std::fs::File; 
+use std::fs::OpenOptions; 
 
 
 mod word_bank;
@@ -16,7 +17,8 @@ fn main() {
     println!("Input file: {:?}", bank_file.display()); 
     println!("Word Box Size: {}", size); 
 
-    println!("Starting test (3x3s)");
+    println!("Starting ({}x{}s)", size, size);
+
 
     let before = Instant::now(); 
 
@@ -25,6 +27,7 @@ fn main() {
         size); 
 
     println!("Word bank size: {}", data.bank.len());
+    println!("Scanning {} possible iterations...", data.bank.len().pow(size as u32));
 
     let boxes: Vec<word_bank::WordBox> = data.find_boxes();
 
@@ -41,5 +44,21 @@ fn main() {
         }
     }
 
-    println!("Elapsed time: {:.4?}", before.elapsed()); 
+    let duration = before.elapsed();
+    println!("Elapsed time: {:.4?}", duration); 
+
+    let stats_path = Path::new("runs.csv"); 
+
+    let exists = stats_path.try_exists().unwrap(); 
+
+    let mut file = match OpenOptions::new().write(true).append(true).create(true).open(stats_path) {
+        Err(why) => panic!("couldn't open {}: {}", "runs.csv", why),
+        Ok(file) => file,
+    };
+    
+    if !exists {
+        let _ = write!(file, "size,bank_size,duration(s)\n").unwrap();
+    }
+
+    let _ = write!(file, "{},{},{}\n", size, data.bank.len(), duration.as_secs_f64()).unwrap();
 }
