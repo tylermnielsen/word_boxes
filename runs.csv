@@ -1,4 +1,2 @@
-size,bank_size,duration(s)
-3,125,2.3534057
-3,125,2.1674881
-3,125,2.2310919
+size,source,bank_size,found,duration(s)
+3,data/common_words.txt,125,254,2.3591885
