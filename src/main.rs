@@ -6,6 +6,7 @@ use std::path::Path;
 use std::time::Instant;
 
 mod word_bank;
+mod word_box;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -28,7 +29,7 @@ fn main() {
         data.bank.len().pow(size as u32)
     );
 
-    let boxes: Vec<word_bank::WordBox> = data.find_boxes();
+    let boxes: Vec<word_box::WordBox> = data.find_boxes();
 
     if args.len() == 4 {
         let output_file = Path::new(&args[3]);

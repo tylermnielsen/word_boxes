@@ -1,30 +1,10 @@
-use core::fmt;
 // scan and index words to be retrieved via index
 // check if word is in index
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::{collections::HashSet, path::Path};
 
-pub struct WordBox {
-    pub letters: Vec<Vec<char>>,
-}
-
-impl WordBox {
-    pub fn add_word(&mut self, word: &String) {
-        self.letters.push(word.chars().collect());
-    }
-}
-
-impl fmt::Display for WordBox {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut wb: String = String::new();
-        for word in &self.letters {
-            wb += word.iter().collect::<String>().as_str();
-            wb += "\n";
-        }
-        write!(f, "{}", wb)
-    }
-}
+use crate::word_box::WordBox;
 
 pub struct WordBank {
     size: usize,
