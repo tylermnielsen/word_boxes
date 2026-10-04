@@ -1,6 +1,5 @@
 use std::env;
-use std::fs::File;
-use std::fs::OpenOptions;
+use std::fs::{File, OpenOptions};
 use std::io::Write;
 use std::path::Path;
 use std::time::Instant;
@@ -11,7 +10,7 @@ mod word_box;
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let bank_file = Path::new(&args[1]); // Path::new("data/common_words.txt");
+    let bank_file = Path::new(&args[1]);
     let size = args[2].parse::<usize>().unwrap();
 
     println!("Input file: {:?}", bank_file.display());
@@ -26,7 +25,7 @@ fn main() {
     println!("Word bank size: {}", data.bank.len());
     println!(
         "Scanning {} possible iterations...",
-        data.bank.len().pow(size as u32)
+        (data.bank.len() as u128).pow(size as u32)
     );
 
     let boxes: Vec<word_box::WordBox> = data.find_boxes();
