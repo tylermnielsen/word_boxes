@@ -1,3 +1,8 @@
 size,source,bank_size,found,duration(s)
 3,data/common_words.txt,125,254,2.3591885
 3,data/common_words.txt,125,254,2.1665843
+3,data/just_test.txt,3,1,0.0010389
+3,data/just_test.txt,3,1,0.0073586
+3,data/just_test.txt,3,1,0.0020298
+3,data/just_test.txt,3,1,0.0009375
+3,data/common_words.txt,125,254,0.1982555

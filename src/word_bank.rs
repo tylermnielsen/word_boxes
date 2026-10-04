@@ -5,11 +5,23 @@ use std::{collections::HashMap, path::Path};
 
 use crate::word_box::WordBox;
 
-#[derive(Default, Debug)]
+#[derive(Default)]
 struct TrieNode {
     pub letter: char,
     pub children: HashMap<char, TrieNode>,
     pub valid: bool,
+}
+
+impl fmt::Debug for TrieNode {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{} ({}) children: {:?}",
+            self.letter,
+            self.valid,
+            self.children.keys()
+        )
+    }
 }
 
 impl fmt::Display for TrieNode {
@@ -103,6 +115,7 @@ impl WordBank {
         let mut gens = vec![vec![&self.lookup; self.size]]; 
 
         while words.len() > 0 {
+          // println!("Words: {:?} \nGens: {:?}", words, gens.last().unwrap());
           // try to add the top of place to the box 
           let mut next_gen: Vec<&TrieNode> = Vec::with_capacity(self.size); 
           let mut failed = false; 
@@ -117,8 +130,10 @@ impl WordBank {
             }
           }
 
+          // println!("Failed: {}", failed); 
+
           // success condition  
-          if failed == false{
+          if failed == false {
             if words.len() == self.size {
               let mut wb = WordBox::new(); 
               for w in &words {
@@ -133,7 +148,8 @@ impl WordBank {
          
           // in any case we advance 
           // increment the top if it exists 
-          if words.len() == self.size && let Some(top) = words.last_mut() {
+          
+          if (failed || words.len() == self.size) && let Some(top) = words.last_mut() {
             *top += 1; 
           } else {
             words.push(0); 
@@ -152,7 +168,7 @@ impl WordBank {
               break; // top is within the bank 
             }
           }
-          
+          // println!(); 
         }
 
         return boxes; 
