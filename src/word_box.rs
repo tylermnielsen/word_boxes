@@ -6,10 +6,6 @@ pub struct WordBox {
 }
 
 impl WordBox {
-    pub fn add_string(&mut self, word: &String) {
-        self.letters.push(word.chars().collect());
-    }
-
     pub fn add_row(&mut self, word: &Vec<char>) {
         self.letters.push(word.clone());
     }
