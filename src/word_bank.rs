@@ -1,20 +1,42 @@
-// scan and index words to be retrieved via index
-// check if word is in index
+use core::fmt;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::{collections::HashSet, path::Path};
+use std::{collections::HashMap, path::Path};
 
 use crate::word_box::WordBox;
 
+#[derive(Default, Debug)]
+struct TrieNode {
+  pub letter: char, 
+  pub children: HashMap<char, TrieNode>, 
+  pub valid: bool,
+}
+
+impl fmt::Display for TrieNode {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{} ({}) children: {:?}", self.letter, self.valid, self.children.keys())
+  }
+}
+
+impl TrieNode {
+  pub fn new(letter: char) -> TrieNode {
+    return TrieNode {
+      letter: letter, 
+      children: HashMap::new(), 
+      valid: false
+    }
+  }
+}
+
 pub struct WordBank {
-    size: usize,
-    pub lookup: HashSet<String>,
-    pub bank: Vec<String>,
+    pub size: usize,
+    lookup: TrieNode,
+    pub bank: Vec<Vec<char>>,
 }
 
 impl WordBank {
     pub fn new(path: &Path, size: usize) -> WordBank {
-        let mut bank: Vec<String> = Vec::new();
+        let mut bank: Vec<Vec<char>> = Vec::new();
 
         let file = match File::open(path) {
             Err(why) => panic!("couldn't open {}: {}", path.display(), why),
@@ -30,15 +52,40 @@ impl WordBank {
             let word = line.trim().to_string(); // remove whitespace and newline
 
             if word.chars().count() == size {
-                bank.push(word.clone());
+                bank.push(word.chars().collect());
             }
 
             line.clear();
         }
 
-        let lookup: HashSet<String> = bank.iter().cloned().collect();
+        let mut lookup: TrieNode = TrieNode::new('_');
+
+        for word in &bank {
+          let mut temp = &mut lookup; 
+          for c in word {
+            if temp.children.contains_key(c) == false {
+              temp.children.insert(*c, TrieNode::new(*c)); 
+            }
+            // tested and created before if needed 
+            temp = temp.children.get_mut(c).unwrap(); 
+          }
+          temp.valid = true; 
+        }
 
         return WordBank { size, lookup, bank };
+    }
+
+    pub fn is_valid_word(&self, word: &Vec<char>) -> bool {
+      let mut temp = &self.lookup; 
+      
+      for c in word {
+        match temp.children.get(c) {
+          Some(child) => temp = child, 
+          None => return false,
+        }
+      }
+
+      return temp.valid; 
     }
 
     pub fn find_boxes(&self) -> Vec<WordBox> {
@@ -53,16 +100,16 @@ impl WordBank {
             };
 
             for p in &place {
-                wb.add_word(&self.bank[*p]);
+                wb.add_row(&self.bank[*p]);
             }
 
-            let mut word: String = String::with_capacity(32);
+            let mut word: Vec<char> = Vec::with_capacity(self.size);
             let mut valid: bool = true;
             for col in 0..wb.letters.len() {
                 for row in 0..wb.letters.len() {
                     word.push(wb.letters[row][col]);
                 }
-                if self.lookup.contains(&word) == false {
+                if self.is_valid_word(&word) == false {
                     valid = false;
                     break;
                 }
