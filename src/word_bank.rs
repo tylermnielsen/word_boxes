@@ -2,10 +2,11 @@ use core::fmt;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::{collections::HashMap, path::Path};
+use std::thread; 
 
 use crate::word_box::WordBox;
 
-#[derive(Default)]
+
 struct TrieNode {
     pub letter: char,
     pub children: HashMap<char, TrieNode>,
@@ -107,11 +108,11 @@ impl WordBank {
         return temp.valid;
     }
 
-    pub fn find_boxes(&self) -> Vec<WordBox> {
+    pub fn find_boxes(&self, start: usize, stop: usize) -> Vec<WordBox> {
         let mut boxes: Vec<WordBox> = Vec::new();
 
         let mut words: Vec<usize> = Vec::new();
-        words.push(0);
+        words.push(start);
         let mut gens = vec![vec![&self.lookup; self.size]];
 
         while words.len() > 0 {
@@ -160,8 +161,8 @@ impl WordBank {
             }
 
             // cascade the increment if necessary
-            while let Some(top) = words.last_mut() {
-                if *top >= self.bank.len() {
+            while let Some(top) = words.last() {
+                if (words.len() == 1 && *top >= stop) || *top >= self.bank.len() {
                     words.pop(); // cascade
                     gens.pop();
 
@@ -176,5 +177,35 @@ impl WordBank {
         }
 
         return boxes;
+    }
+
+    pub fn find_boxes_multithreaded(&self, thread_count: usize) -> Vec<WordBox> {
+        let all_words = self.bank.len(); 
+        let set_size = all_words / thread_count; 
+
+        let boxes = thread::scope(|s| {
+            let mut handles = Vec::new(); 
+            for i in 0..thread_count {
+                let start = i * set_size; 
+                let stop = if i == thread_count-1 { all_words } else { start + set_size };
+
+                handles.push(s.spawn(move || {
+                    return self.find_boxes(start, stop);
+                }));
+            }
+            
+            let mut boxes = Vec::new(); 
+            for h in handles {
+                match h.join() {
+                    Ok(mut new_boxes) => boxes.append(&mut new_boxes),
+                    Err(_) => println!("Error on join") 
+                }
+                
+            }
+            
+            return boxes; 
+        });
+
+        return boxes; 
     }
 }
