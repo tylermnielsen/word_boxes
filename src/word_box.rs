@@ -6,8 +6,11 @@ pub struct WordBox {
 }
 
 impl WordBox {
-    pub fn add_row(&mut self, word: &Vec<char>) {
-        self.letters.push(word.clone());
+    pub fn new() -> WordBox {
+        return WordBox { letters: Vec::new() };
+    }
+    pub fn add_row(&mut self, word: Vec<char>) {
+        self.letters.push(word);
     }
 }
 

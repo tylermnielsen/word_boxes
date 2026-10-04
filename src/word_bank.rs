@@ -81,6 +81,7 @@ impl WordBank {
         return WordBank { size, lookup, bank };
     }
 
+    #[allow(dead_code)]
     pub fn is_valid_word(&self, word: &Vec<char>) -> bool {
         let mut temp = &self.lookup;
 
@@ -97,49 +98,63 @@ impl WordBank {
     pub fn find_boxes(&self) -> Vec<WordBox> {
         let mut boxes: Vec<WordBox> = Vec::new();
 
-        let mut place: Vec<usize> = vec![0; self.size];
+        let mut words: Vec<usize> = Vec::new(); 
+        words.push(0); 
+        let mut gens = vec![vec![&self.lookup; self.size]]; 
 
-        loop {
-            // create and test
-            let mut wb: WordBox = WordBox {
-                letters: Vec::new(),
-            };
+        while words.len() > 0 {
+          // try to add the top of place to the box 
+          let mut next_gen: Vec<&TrieNode> = Vec::with_capacity(self.size); 
+          let mut failed = false; 
+          for i in 0..(self.size) {
+            let top = &self.bank[*words.last().unwrap()]; 
 
-            for p in &place {
-                wb.add_row(&self.bank[*p]);
+            if gens.last().unwrap()[i].children.contains_key(&top[i]) {
+              next_gen.push(&gens.last().unwrap()[i].children[&top[i]]);
+            } else {
+              failed = true; 
+              break; 
             }
+          }
 
-            let mut word: Vec<char> = Vec::with_capacity(self.size);
-            let mut valid: bool = true;
-            for col in 0..wb.letters.len() {
-                for row in 0..wb.letters.len() {
-                    word.push(wb.letters[row][col]);
-                }
-                if self.is_valid_word(&word) == false {
-                    valid = false;
-                    break;
-                }
-                word.clear();
+          // success condition  
+          if failed == false{
+            if words.len() == self.size {
+              let mut wb = WordBox::new(); 
+              for w in &words {
+                wb.add_row(self.bank[*w].clone());
+              }
+              boxes.push(wb); 
+              println!("{}", boxes.last().unwrap());
+            } else {
+              gens.push(next_gen); 
             }
+          } 
+         
+          // in any case we advance 
+          // increment the top if it exists 
+          if words.len() == self.size && let Some(top) = words.last_mut() {
+            *top += 1; 
+          } else {
+            words.push(0); 
+          }
 
-            if valid {
-                println!("{}", wb);
-                boxes.push(wb);
+          // cascade the increment if necessary 
+          while let Some(top) = words.last_mut() {
+            if *top >= self.bank.len() {
+              words.pop(); // cascade 
+              gens.pop(); 
+
+              if let Some(next_top) = words.last_mut() {
+                *next_top += 1; 
+              }
+            } else {
+              break; // top is within the bank 
             }
-
-            // next word box
-            place[0] += 1;
-            let mut i = 0;
-            while place[i] >= self.bank.len() {
-                place[i] = 0;
-                if i + 1 >= place.len() {
-                    return boxes;
-                } else {
-                    place[i + 1] += 1;
-                }
-
-                i += 1;
-            }
+          }
+          
         }
+
+        return boxes; 
     }
 }
