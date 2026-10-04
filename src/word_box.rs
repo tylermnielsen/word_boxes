@@ -1,4 +1,4 @@
-use core::fmt; 
+use core::fmt;
 
 #[derive(Debug, Clone)]
 pub struct WordBox {
@@ -11,7 +11,7 @@ impl WordBox {
     }
 
     pub fn add_row(&mut self, word: &Vec<char>) {
-      self.letters.push(word.clone()); 
+        self.letters.push(word.clone());
     }
 }
 

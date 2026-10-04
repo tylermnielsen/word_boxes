@@ -7,25 +7,31 @@ use crate::word_box::WordBox;
 
 #[derive(Default, Debug)]
 struct TrieNode {
-  pub letter: char, 
-  pub children: HashMap<char, TrieNode>, 
-  pub valid: bool,
+    pub letter: char,
+    pub children: HashMap<char, TrieNode>,
+    pub valid: bool,
 }
 
 impl fmt::Display for TrieNode {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    write!(f, "{} ({}) children: {:?}", self.letter, self.valid, self.children.keys())
-  }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{} ({}) children: {:?}",
+            self.letter,
+            self.valid,
+            self.children.keys()
+        )
+    }
 }
 
 impl TrieNode {
-  pub fn new(letter: char) -> TrieNode {
-    return TrieNode {
-      letter: letter, 
-      children: HashMap::new(), 
-      valid: false
+    pub fn new(letter: char) -> TrieNode {
+        return TrieNode {
+            letter: letter,
+            children: HashMap::new(),
+            valid: false,
+        };
     }
-  }
 }
 
 pub struct WordBank {
@@ -61,31 +67,31 @@ impl WordBank {
         let mut lookup: TrieNode = TrieNode::new('_');
 
         for word in &bank {
-          let mut temp = &mut lookup; 
-          for c in word {
-            if temp.children.contains_key(c) == false {
-              temp.children.insert(*c, TrieNode::new(*c)); 
+            let mut temp = &mut lookup;
+            for c in word {
+                if temp.children.contains_key(c) == false {
+                    temp.children.insert(*c, TrieNode::new(*c));
+                }
+                // tested and created before if needed
+                temp = temp.children.get_mut(c).unwrap();
             }
-            // tested and created before if needed 
-            temp = temp.children.get_mut(c).unwrap(); 
-          }
-          temp.valid = true; 
+            temp.valid = true;
         }
 
         return WordBank { size, lookup, bank };
     }
 
     pub fn is_valid_word(&self, word: &Vec<char>) -> bool {
-      let mut temp = &self.lookup; 
-      
-      for c in word {
-        match temp.children.get(c) {
-          Some(child) => temp = child, 
-          None => return false,
-        }
-      }
+        let mut temp = &self.lookup;
 
-      return temp.valid; 
+        for c in word {
+            match temp.children.get(c) {
+                Some(child) => temp = child,
+                None => return false,
+            }
+        }
+
+        return temp.valid;
     }
 
     pub fn find_boxes(&self) -> Vec<WordBox> {
