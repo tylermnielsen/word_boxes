@@ -48,7 +48,7 @@ impl TrieNode {
 
 pub struct WordBank {
     width: usize,
-    height: usize, 
+    height: usize,
     lookup: TrieNode,
     pub bank: Vec<Vec<char>>,
 }
@@ -56,7 +56,7 @@ pub struct WordBank {
 impl WordBank {
     pub fn new(path: &Path, width: usize, height: usize) -> WordBank {
         let mut bank: Vec<Vec<char>> = Vec::new();
-        let mut lookup_bank: Vec<Vec<char>> = Vec::new(); 
+        let mut lookup_bank: Vec<Vec<char>> = Vec::new();
 
         let file = match File::open(path) {
             Err(why) => panic!("couldn't open {}: {}", path.display(), why),
@@ -72,14 +72,14 @@ impl WordBank {
             }
             let word = line.trim().to_string(); // remove whitespace and newline
 
-            let char_count = word.chars().count(); 
-            
+            let char_count = word.chars().count();
+
             if char_count == width {
                 bank.push(word.chars().collect());
             }
-            
+
             if char_count == height {
-                lookup_bank.push(word.chars().collect()); 
+                lookup_bank.push(word.chars().collect());
             }
 
             line.clear();
@@ -99,7 +99,12 @@ impl WordBank {
             temp.valid = true;
         }
 
-        return WordBank { width, height, lookup, bank };
+        return WordBank {
+            width,
+            height,
+            lookup,
+            bank,
+        };
     }
 
     #[allow(dead_code)]

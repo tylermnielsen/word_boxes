@@ -12,13 +12,13 @@ fn main() {
 
     let bank_file = Path::new(&args[1]);
     let width = args[2].parse::<usize>().unwrap();
-    let height = args[3].parse::<usize>().unwrap(); 
+    let height = args[3].parse::<usize>().unwrap();
 
     println!("Input file: {:?}", bank_file.display());
     if args.len() == 5 {
-        println!("Output file: {}", args[4]); 
+        println!("Output file: {}", args[4]);
     } else {
-        println!("No output file"); 
+        println!("No output file");
     }
     println!("Target Size: {}x{}", width, height);
 
@@ -92,7 +92,8 @@ fn main() {
     let _ = write!(
         file,
         "{}x{},{},{},{},{},{}\n",
-        width, height,
+        width,
+        height,
         bank_file.display(),
         data.bank.len(),
         boxes.len(),
