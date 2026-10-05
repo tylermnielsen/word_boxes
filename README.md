@@ -5,7 +5,7 @@ Utilizes a trie with prefix matching to more effectively traverse the combinatio
 
 ### Use
 ```
-word_boxes.exe [input file] [width] [height] [output file]
+./word_boxes.exe [input file] [width] [height] [output file]
 ```
 
 ### Example boxes 
