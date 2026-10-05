@@ -1,8 +1,8 @@
-use std::{env, thread};
 use std::fs::{File, OpenOptions};
 use std::io::Write;
 use std::path::Path;
 use std::time::Instant;
+use std::{env, thread};
 
 mod word_bank;
 mod word_box;
@@ -23,22 +23,25 @@ fn main() {
     let data: word_bank::WordBank = word_bank::WordBank::new(bank_file, size);
 
     let thread_count = match thread::available_parallelism() {
-        Ok(tc) => tc.get(), 
-        Err(_) => 4 // arbitrary default
+        Ok(tc) => tc.get(),
+        Err(_) => 4, // arbitrary default
     };
 
     println!("Word bank size: {}", data.bank.len());
-    println!("Thread Count: {}", thread_count); 
+    println!("Thread Count: {}", thread_count);
     println!(
         "Scanning {} possible iterations...",
         (data.bank.len() as u128).pow(size as u32)
     );
 
     // let boxes: Vec<word_box::WordBox> = data.find_boxes(0, data.bank.len());
-    let boxes = data.find_boxes_multithreaded(thread_count); 
+    let boxes = data.find_boxes_multithreaded(thread_count);
 
-    let work_only_duration = before.elapsed(); 
-    println!("Elapsed time (without saving output): {:.4?}", work_only_duration);
+    let work_only_duration = before.elapsed();
+    println!(
+        "Elapsed time (without saving output): {:.4?}",
+        work_only_duration
+    );
 
     if args.len() == 4 {
         let output_file = Path::new(&args[3]);
@@ -71,7 +74,11 @@ fn main() {
     };
 
     if !exists {
-        let _ = write!(file, "size,source,bank_size,found,work only duration(s),duration(s)\n").unwrap();
+        let _ = write!(
+            file,
+            "size,source,bank_size,found,work only duration(s),duration(s)\n"
+        )
+        .unwrap();
     }
 
     let _ = write!(

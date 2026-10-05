@@ -1,11 +1,10 @@
 use core::fmt;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::thread;
 use std::{collections::HashMap, path::Path};
-use std::thread; 
 
 use crate::word_box::WordBox;
-
 
 struct TrieNode {
     pub letter: char,
@@ -180,32 +179,35 @@ impl WordBank {
     }
 
     pub fn find_boxes_multithreaded(&self, thread_count: usize) -> Vec<WordBox> {
-        let all_words = self.bank.len(); 
-        let set_size = all_words / thread_count; 
+        let all_words = self.bank.len();
+        let set_size = all_words / thread_count;
 
         let boxes = thread::scope(|s| {
-            let mut handles = Vec::new(); 
+            let mut handles = Vec::new();
             for i in 0..thread_count {
-                let start = i * set_size; 
-                let stop = if i == thread_count-1 { all_words } else { start + set_size };
+                let start = i * set_size;
+                let stop = if i == thread_count - 1 {
+                    all_words
+                } else {
+                    start + set_size
+                };
 
                 handles.push(s.spawn(move || {
                     return self.find_boxes(start, stop);
                 }));
             }
-            
-            let mut boxes = Vec::new(); 
+
+            let mut boxes = Vec::new();
             for h in handles {
                 match h.join() {
                     Ok(mut new_boxes) => boxes.append(&mut new_boxes),
-                    Err(_) => println!("Error on join") 
+                    Err(_) => println!("Error on join"),
                 }
-                
             }
-            
-            return boxes; 
+
+            return boxes;
         });
 
-        return boxes; 
+        return boxes;
     }
 }
