@@ -47,20 +47,23 @@ impl TrieNode {
 }
 
 pub struct WordBank {
-    pub size: usize,
+    width: usize,
+    height: usize, 
     lookup: TrieNode,
     pub bank: Vec<Vec<char>>,
 }
 
 impl WordBank {
-    pub fn new(path: &Path, size: usize) -> WordBank {
+    pub fn new(path: &Path, width: usize, height: usize) -> WordBank {
         let mut bank: Vec<Vec<char>> = Vec::new();
+        let mut lookup_bank: Vec<Vec<char>> = Vec::new(); 
 
         let file = match File::open(path) {
             Err(why) => panic!("couldn't open {}: {}", path.display(), why),
             Ok(file) => file,
         };
 
+        // read into word bank and lookup bank used to create lookup trie
         let mut reader = BufReader::new(file);
         let mut line: String = String::with_capacity(32); // preallocate
         while let Ok(len) = reader.read_line(&mut line) {
@@ -69,8 +72,14 @@ impl WordBank {
             }
             let word = line.trim().to_string(); // remove whitespace and newline
 
-            if word.chars().count() == size {
+            let char_count = word.chars().count(); 
+            
+            if char_count == width {
                 bank.push(word.chars().collect());
+            }
+            
+            if char_count == height {
+                lookup_bank.push(word.chars().collect()); 
             }
 
             line.clear();
@@ -78,7 +87,7 @@ impl WordBank {
 
         let mut lookup: TrieNode = TrieNode::new('_');
 
-        for word in &bank {
+        for word in &lookup_bank {
             let mut temp = &mut lookup;
             for c in word {
                 if temp.children.contains_key(c) == false {
@@ -90,7 +99,7 @@ impl WordBank {
             temp.valid = true;
         }
 
-        return WordBank { size, lookup, bank };
+        return WordBank { width, height, lookup, bank };
     }
 
     #[allow(dead_code)]
@@ -112,14 +121,14 @@ impl WordBank {
 
         let mut words: Vec<usize> = Vec::new();
         words.push(start);
-        let mut gens = vec![vec![&self.lookup; self.size]];
+        let mut gens = vec![vec![&self.lookup; self.width]];
 
         while words.len() > 0 {
             // println!("Words: {:?} \nGens: {:?}", words, gens.last().unwrap());
             // try to add the top of place to the box
-            let mut next_gen: Vec<&TrieNode> = Vec::with_capacity(self.size);
+            let mut next_gen: Vec<&TrieNode> = Vec::with_capacity(self.width);
             let mut failed = false;
-            for i in 0..(self.size) {
+            for i in 0..(self.width) {
                 let top = &self.bank[*words.last().unwrap()];
 
                 if gens.last().unwrap()[i].children.contains_key(&top[i]) {
@@ -134,7 +143,7 @@ impl WordBank {
 
             // success condition
             if failed == false {
-                if words.len() == self.size {
+                if words.len() == self.height {
                     let mut wb = WordBox::new();
                     for w in &words {
                         wb.add_row(self.bank[*w].clone());
@@ -149,7 +158,7 @@ impl WordBank {
             // in any case we advance
             // increment the top if it exists
 
-            if failed || words.len() == self.size {
+            if failed || words.len() == self.height {
                 if let Some(top) = words.last_mut() {
                     *top += 1;
                 } else {

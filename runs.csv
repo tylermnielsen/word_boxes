@@ -29,3 +29,9 @@ size,source,bank_size,found,work only duration(s), duration(s)
 3,data/common_words.txt,125,254,-,0.0118788
 3,data/scrabble_dictionary.txt,1347,11339089,-,292.278744
 3,data/common_words.txt,125,254,0.0086555,0.0339155
+3x3,data/common_words.txt,125,254,0.0084041,0.0341112
+3x3,data/common_words.txt,125,254,0.0076816,0.0111524
+3x4,data/common_words.txt,125,10,0.0070512,0.0074993
+3x2,data/common_words.txt,125,7,0.0018518,0.0023884
+4x3,data/common_words.txt,327,10,0.0176017,0.0185751
+3x4,data/common_words.txt,125,10,0.0070464,0.0078503

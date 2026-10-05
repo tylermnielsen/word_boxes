@@ -11,16 +11,20 @@ fn main() {
     let args: Vec<String> = env::args().collect();
 
     let bank_file = Path::new(&args[1]);
-    let size = args[2].parse::<usize>().unwrap();
+    let width = args[2].parse::<usize>().unwrap();
+    let height = args[3].parse::<usize>().unwrap(); 
 
     println!("Input file: {:?}", bank_file.display());
-    println!("Word Box Size: {}", size);
-
-    println!("Starting ({}x{}s)", size, size);
+    if args.len() == 5 {
+        println!("Output file: {}", args[4]); 
+    } else {
+        println!("No output file"); 
+    }
+    println!("Target Size: {}x{}", width, height);
 
     let before = Instant::now();
 
-    let data: word_bank::WordBank = word_bank::WordBank::new(bank_file, size);
+    let data: word_bank::WordBank = word_bank::WordBank::new(bank_file, width, height);
 
     let thread_count = match thread::available_parallelism() {
         Ok(tc) => tc.get(),
@@ -31,7 +35,7 @@ fn main() {
     println!("Thread Count: {}", thread_count);
     println!(
         "Scanning {} possible iterations...",
-        (data.bank.len() as u128).pow(size as u32)
+        (data.bank.len() as u128).pow(height as u32)
     );
 
     // let boxes: Vec<word_box::WordBox> = data.find_boxes(0, data.bank.len());
@@ -43,8 +47,8 @@ fn main() {
         work_only_duration
     );
 
-    if args.len() == 4 {
-        let output_file = Path::new(&args[3]);
+    if args.len() == 5 {
+        let output_file = Path::new(&args[4]);
 
         let mut file = match File::create(output_file) {
             Err(why) => panic!("couldn't open {}: {}", output_file.display(), why),
@@ -53,6 +57,10 @@ fn main() {
 
         for wb in &boxes {
             let _ = write!(file, "{}\n", wb).unwrap();
+        }
+    } else {
+        for wb in &boxes {
+            println!("{}\n", wb);
         }
     }
 
@@ -83,8 +91,8 @@ fn main() {
 
     let _ = write!(
         file,
-        "{},{},{},{},{},{}\n",
-        size,
+        "{}x{},{},{},{},{},{}\n",
+        width, height,
         bank_file.display(),
         data.bank.len(),
         boxes.len(),
