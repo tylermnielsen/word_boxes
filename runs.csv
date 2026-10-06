@@ -36,3 +36,6 @@ size,source,bank_size,found,work only duration(s), duration(s)
 4x3,data/common_words.txt,327,10,0.0176017,0.0185751
 3x4,data/common_words.txt,125,10,0.0070464,0.0078503
 5x3,data/common_words.txt,238,0,0.0072083,0.0076488
+3x5,data/common_words.txt,125,0,0.0209285,0.0221331
+3x6,data/common_words.txt,125,0,0.0047284,0.0049467
+4x5,data/common_words.txt,327,0,0.0225777,0.0230378
