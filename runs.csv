@@ -39,3 +39,7 @@ size,source,bank_size,found,work only duration(s), duration(s)
 3x5,data/common_words.txt,125,0,0.0209285,0.0221331
 3x6,data/common_words.txt,125,0,0.0047284,0.0049467
 4x5,data/common_words.txt,327,0,0.0225777,0.0230378
+3x3,data/scrabble_dictionary.txt,1347,11339089,11.6364651,97.9849902
+3x3,data/scrabble_dictionary.txt,1347,11339089,86.3872457,196.8498993
+3x3,data/scrabble_dictionary.txt,1347,11339089,77.1888582,91.358757
+3x3,data/scrabble_dictionary.txt,1347,11339089,9.1703435,12.2679473

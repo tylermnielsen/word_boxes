@@ -1,8 +1,9 @@
 use std::fs::{File, OpenOptions};
-use std::io::Write;
+use std::io::{BufWriter, Write};
 use std::path::Path;
 use std::time::Instant;
 use std::{env, thread};
+
 
 mod word_bank;
 mod word_box;
@@ -50,13 +51,21 @@ fn main() {
     if args.len() == 5 {
         let output_file = Path::new(&args[4]);
 
-        let mut file = match File::create(output_file) {
+        let file = match File::create(output_file) {
             Err(why) => panic!("couldn't open {}: {}", output_file.display(), why),
             Ok(file) => file,
         };
 
+        let mut writer = BufWriter::new(file);
+
+        let mut temp = String::new(); 
         for wb in &boxes {
-            let _ = write!(file, "{}\n", wb).unwrap();
+            for word in &wb.letters {
+                temp += word.iter().collect::<String>().as_str();
+                temp += "\n";
+            }
+            writeln!(writer, "{}", temp).unwrap();
+            temp.clear(); 
         }
     } else {
         for wb in &boxes {
