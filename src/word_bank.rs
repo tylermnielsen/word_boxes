@@ -1,10 +1,10 @@
 use core::fmt;
 use std::fs::File;
-use std::io::{BufRead, BufReader};
-use std::io::{BufWriter, Write};
-use std::sync::{atomic::AtomicBool, atomic::Ordering, mpsc, Arc};
-use std::{collections::HashMap, path::Path};
-use std::{thread, time};
+use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::sync::mpsc;
+use std::collections::HashMap;
+use std::path::Path;
+use std::thread;
 
 use crate::word_box::WordBox;
 
