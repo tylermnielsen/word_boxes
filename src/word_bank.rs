@@ -1,8 +1,10 @@
 use core::fmt;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::thread;
+use std::io::{BufWriter, Write};
+use std::sync::{atomic::AtomicBool, atomic::Ordering, mpsc, Arc};
 use std::{collections::HashMap, path::Path};
+use std::{thread, time};
 
 use crate::word_box::WordBox;
 
@@ -121,9 +123,7 @@ impl WordBank {
         return temp.valid;
     }
 
-    pub fn find_boxes(&self, start: usize, stop: usize) -> Vec<WordBox> {
-        let mut boxes: Vec<WordBox> = Vec::new();
-
+    pub fn find_boxes(&self, start: usize, stop: usize, output: mpsc::Sender<WordBox>) {
         let mut words: Vec<usize> = Vec::new();
         words.push(start);
         let mut gens = vec![vec![&self.lookup; self.width]];
@@ -153,8 +153,8 @@ impl WordBank {
                     for w in &words {
                         wb.add_row(self.bank[*w].clone());
                     }
-                    boxes.push(wb);
-                    // println!("{}", boxes.last().unwrap());
+                    output.send(wb).unwrap(); // send to output
+                                              // println!("{}", boxes.last().unwrap());
                 } else {
                     gens.push(next_gen);
                 }
@@ -188,15 +188,53 @@ impl WordBank {
             }
             // println!();
         }
-
-        return boxes;
     }
 
-    pub fn find_boxes_multithreaded(&self, thread_count: usize) -> Vec<WordBox> {
+    fn storage_thread(
+        output_file: &String,
+        rx: mpsc::Receiver<WordBox>,
+        end_signal_recv: Arc<AtomicBool>,
+    ) -> i64 {
+        let output_file = Path::new(output_file);
+
+        let file = match File::create(output_file) {
+            Err(why) => panic!("couldn't open {}: {}", output_file.display(), why),
+            Ok(file) => file,
+        };
+
+        let mut writer = BufWriter::new(file);
+
+        let mut temp = String::new();
+        let mut count: i64 = 0;
+        loop {
+            if let Ok(wb) = rx.recv_timeout(time::Duration::from_millis(1)) {
+                for word in &wb.letters {
+                    temp += word.iter().collect::<String>().as_str();
+                    temp += "\n";
+                }
+                writeln!(writer, "{}", temp).unwrap();
+                temp.clear();
+                count += 1;
+            } else if end_signal_recv.load(Ordering::Relaxed) {
+                return count;
+            }
+        }
+    }
+
+    pub fn find_boxes_multithreaded(&self, thread_count: usize, output_file: &String) -> i64 {
         let all_words = self.bank.len();
         let set_size = all_words / thread_count;
 
-        let boxes = thread::scope(|s| {
+        let count = thread::scope(|s| {
+            let (tx, rx) = mpsc::channel::<WordBox>();
+
+            // spawn consumer
+            let end_signal_send = Arc::new(AtomicBool::new(false));
+            let end_signal_recv = Arc::clone(&end_signal_send);
+            let file_writer = s.spawn(move || {
+                return WordBank::storage_thread(output_file, rx, end_signal_recv);
+            });
+
             let mut handles = Vec::new();
             for i in 0..thread_count {
                 let start = i * set_size;
@@ -206,22 +244,24 @@ impl WordBank {
                     start + set_size
                 };
 
+                let tx_inst = tx.clone();
                 handles.push(s.spawn(move || {
-                    return self.find_boxes(start, stop);
+                    self.find_boxes(start, stop, tx_inst);
                 }));
             }
 
-            let mut boxes = Vec::new();
             for h in handles {
-                match h.join() {
-                    Ok(mut new_boxes) => boxes.append(&mut new_boxes),
-                    Err(_) => println!("Error on join"),
-                }
+                h.join().unwrap();
             }
 
-            return boxes;
+            end_signal_send.store(true, Ordering::Relaxed);
+
+            return match file_writer.join() {
+                Ok(c) => c,
+                Err(_) => -1,
+            };
         });
 
-        return boxes;
+        return count;
     }
 }

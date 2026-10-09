@@ -43,3 +43,11 @@ size,source,bank_size,found,work only duration(s), duration(s)
 3x3,data/scrabble_dictionary.txt,1347,11339089,86.3872457,196.8498993
 3x3,data/scrabble_dictionary.txt,1347,11339089,77.1888582,91.358757
 3x3,data/scrabble_dictionary.txt,1347,11339089,9.1703435,12.2679473
+3x3,data/common_words.txt,125,0,0.053272,0.0533323
+3x3,data/common_words.txt,125,254,0.1114191,0.1114803
+3x3,data/common_words.txt,125,254,0.116786,0.1168632
+3x3,data/common_words.txt,125,254,0.1108842,0.1109827
+3x3,data/common_words.txt,125,254,0.0286476,0.0287268
+3x3,data/common_words.txt,125,254,0.0110467,0.0111348
+3x3,data/common_words.txt,125,254,0.0287133,0.0287873
+3x3,data/common_words.txt,125,254,0.0150606,0.0151957

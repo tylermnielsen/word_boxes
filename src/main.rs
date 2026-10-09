@@ -1,9 +1,8 @@
-use std::fs::{File, OpenOptions};
-use std::io::{BufWriter, Write};
+use std::fs::OpenOptions;
+use std::io::Write;
 use std::path::Path;
 use std::time::Instant;
 use std::{env, thread};
-
 
 mod word_bank;
 mod word_box;
@@ -16,11 +15,7 @@ fn main() {
     let height = args[3].parse::<usize>().unwrap();
 
     println!("Input file: {:?}", bank_file.display());
-    if args.len() == 5 {
-        println!("Output file: {}", args[4]);
-    } else {
-        println!("No output file");
-    }
+    println!("Output file: {}", args[4]);
     println!("Target Size: {}x{}", width, height);
 
     let before = Instant::now();
@@ -28,19 +23,18 @@ fn main() {
     let data: word_bank::WordBank = word_bank::WordBank::new(bank_file, width, height);
 
     let thread_count = match thread::available_parallelism() {
-        Ok(tc) => tc.get(),
-        Err(_) => 4, // arbitrary default
+        Ok(tc) => tc.get() - 1, // reserve 1 thread for storage
+        Err(_) => 4,            // arbitrary default
     };
 
     println!("Word bank size: {}", data.bank.len());
-    println!("Thread Count: {}", thread_count);
+    println!("Thread Count: {} (+1)", thread_count);
     println!(
         "Scanning {} possible iterations...",
         (data.bank.len() as u128).pow(height as u32)
     );
 
-    // let boxes: Vec<word_box::WordBox> = data.find_boxes(0, data.bank.len());
-    let boxes = data.find_boxes_multithreaded(thread_count);
+    let boxes_count = data.find_boxes_multithreaded(thread_count, &args[4]);
 
     let work_only_duration = before.elapsed();
     println!(
@@ -48,6 +42,7 @@ fn main() {
         work_only_duration
     );
 
+    /*
     if args.len() == 5 {
         let output_file = Path::new(&args[4]);
 
@@ -58,20 +53,21 @@ fn main() {
 
         let mut writer = BufWriter::new(file);
 
-        let mut temp = String::new(); 
+        let mut temp = String::new();
         for wb in &boxes {
             for word in &wb.letters {
                 temp += word.iter().collect::<String>().as_str();
                 temp += "\n";
             }
             writeln!(writer, "{}", temp).unwrap();
-            temp.clear(); 
+            temp.clear();
         }
     } else {
         for wb in &boxes {
             println!("{}\n", wb);
         }
     }
+     */
 
     let duration = before.elapsed();
     println!("Elapsed time: {:.4?}", duration);
@@ -105,7 +101,7 @@ fn main() {
         height,
         bank_file.display(),
         data.bank.len(),
-        boxes.len(),
+        boxes_count,
         work_only_duration.as_secs_f64(),
         duration.as_secs_f64()
     )
