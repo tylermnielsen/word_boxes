@@ -42,12 +42,12 @@ honest
 
 #### 6x6
 ```
-estate
-slaves
-talent
-avenue
-tenure
-esteem
+patrol
+ashore
+thomas
+romans
+orange
+lessen
 ```
 
 #### 7x3

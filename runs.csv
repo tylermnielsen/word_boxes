@@ -75,3 +75,8 @@ size,source,bank_size,found,work only duration(s), duration(s)
 6x6,data/top_english_words_lower_20000.txt,2845,72,26.5389092,26.5392434
 7x7,data/top_english_words_lower_20000.txt,2933,0,6.5491694,6.5492632
 8x8,data/top_english_words_lower_20000.txt,2699,0,1.3618037,1.3618999
+6x5,data/top_english_words_lower_10000.txt,1474,0,0.6518243,0.6519087
+6x4,data/top_english_words_lower_20000.txt,2845,924,12.5032854,12.5033546
+6x5,data/top_english_words_lower_20000.txt,2845,4,26.4830778,26.4831672
+7x6,data/top_english_words_lower_20000.txt,2933,0,9.5144847,9.5146296
+8x6,data/top_english_words_lower_20000.txt,2699,0,1.6892036,1.689304
