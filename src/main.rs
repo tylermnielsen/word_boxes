@@ -42,33 +42,6 @@ fn main() {
         work_only_duration
     );
 
-    /*
-    if args.len() == 5 {
-        let output_file = Path::new(&args[4]);
-
-        let file = match File::create(output_file) {
-            Err(why) => panic!("couldn't open {}: {}", output_file.display(), why),
-            Ok(file) => file,
-        };
-
-        let mut writer = BufWriter::new(file);
-
-        let mut temp = String::new();
-        for wb in &boxes {
-            for word in &wb.letters {
-                temp += word.iter().collect::<String>().as_str();
-                temp += "\n";
-            }
-            writeln!(writer, "{}", temp).unwrap();
-            temp.clear();
-        }
-    } else {
-        for wb in &boxes {
-            println!("{}\n", wb);
-        }
-    }
-     */
-
     let duration = before.elapsed();
     println!("Elapsed time: {:.4?}", duration);
 

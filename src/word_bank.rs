@@ -190,11 +190,7 @@ impl WordBank {
         }
     }
 
-    fn storage_thread(
-        output_file: &String,
-        rx: mpsc::Receiver<WordBox>,
-        end_signal_recv: Arc<AtomicBool>,
-    ) -> i64 {
+    fn storage_thread(output_file: &String, rx: mpsc::Receiver<WordBox>) -> i64 {
         let output_file = Path::new(output_file);
 
         let file = match File::create(output_file) {
@@ -206,19 +202,17 @@ impl WordBank {
 
         let mut temp = String::new();
         let mut count: i64 = 0;
-        loop {
-            if let Ok(wb) = rx.recv_timeout(time::Duration::from_millis(1)) {
-                for word in &wb.letters {
-                    temp += word.iter().collect::<String>().as_str();
-                    temp += "\n";
-                }
-                writeln!(writer, "{}", temp).unwrap();
-                temp.clear();
-                count += 1;
-            } else if end_signal_recv.load(Ordering::Relaxed) {
-                return count;
+        for wb in rx {
+            for word in &wb.letters {
+                temp += word.iter().collect::<String>().as_str();
+                temp += "\n";
             }
+            writeln!(writer, "{}", temp).unwrap();
+            temp.clear();
+            count += 1;
         }
+
+        return count;
     }
 
     pub fn find_boxes_multithreaded(&self, thread_count: usize, output_file: &String) -> i64 {
@@ -229,10 +223,8 @@ impl WordBank {
             let (tx, rx) = mpsc::channel::<WordBox>();
 
             // spawn consumer
-            let end_signal_send = Arc::new(AtomicBool::new(false));
-            let end_signal_recv = Arc::clone(&end_signal_send);
             let file_writer = s.spawn(move || {
-                return WordBank::storage_thread(output_file, rx, end_signal_recv);
+                return WordBank::storage_thread(output_file, rx);
             });
 
             let mut handles = Vec::new();
@@ -254,7 +246,7 @@ impl WordBank {
                 h.join().unwrap();
             }
 
-            end_signal_send.store(true, Ordering::Relaxed);
+            drop(tx); // disconnect sender - doubles as exit signal to storage thread
 
             return match file_writer.join() {
                 Ok(c) => c,
