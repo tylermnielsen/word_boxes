@@ -32,6 +32,31 @@ sell
 half
 ```
 
+#### 6x4
+```
+corner
+anyone
+stands
+honest
+```
+
+#### 6x6
+```
+estate
+slaves
+talent
+avenue
+tenure
+esteem
+```
+
+#### 7x3
+```
+federal
+average
+related
+```
+
 Usable word banks are in [data](/data/) (a smaller dataset of common words, scrabble dictionary, and full english word list) 
 
 Output files are in [output](/output/) with run stats in [runs.csv](/runs.csv)
