@@ -1,3 +1,0 @@
-#!/bin/bash
-
-wget https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words_alpha.txt

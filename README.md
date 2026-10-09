@@ -36,3 +36,6 @@ Usable word banks are in [data](/data/) (a smaller dataset of common words, scra
 
 Output files are in [output](/output/) with run stats in [runs.csv](/runs.csv)
 
+
+### Most Common Word Source
+https://github.com/david47k/top-english-wordlists (with words containing non alphabetic characters filtered out)

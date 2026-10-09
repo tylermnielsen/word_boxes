@@ -55,3 +55,17 @@ size,source,bank_size,found,work only duration(s), duration(s)
 3x3,data/scrabble_dictionary.txt,1347,11339089,6.8632072,6.863511
 3x3,data/scrabble_dictionary.txt,1347,11339089,9.1523018,9.1523902
 3x3,data/common_words.txt,125,254,0.0256013,0.0256968
+3x3,data/top_english_words_lower_10000.txt,390,18819,0.0620971,0.0622403
+4x4,data/top_english_words_lower_10000.txt,927,17833,0.802565,0.8026943
+5x5,data/top_english_words_lower_10000.txt,1271,790,1.7791071999999999,1.7792341
+6x6,data/top_english_words_lower_10000.txt,1474,1,0.5757804,0.5758961
+7x7,data/top_english_words_lower_10000.txt,1486,0,0.3472089,0.3473657
+4x3,data/top_english_words_lower_10000.txt,927,6022,0.2351933,0.2352654
+5x3,data/top_english_words_lower_10000.txt,1271,1487,0.3327762,0.3328769
+6x3,data/top_english_words_lower_10000.txt,1474,146,0.2361683,0.2362647
+7x3,data/top_english_words_lower_10000.txt,1486,18,0.1370467,0.1371238
+7x4,data/top_english_words_lower_10000.txt,1486,0,0.3009369,0.3010432
+6x4,data/top_english_words_lower_10000.txt,1474,1,0.4148086,0.4149164
+5x4,data/top_english_words_lower_10000.txt,1271,73,0.754792,0.7549083
+6x4,data/top_english_words_lower_10000.txt,1474,1,0.4185081,0.4187854
+5x4,data/top_english_words_lower_10000.txt,1271,73,0.71125,0.7113678

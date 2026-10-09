@@ -1,9 +1,9 @@
 use core::fmt;
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader, BufWriter, Write};
-use std::sync::mpsc;
-use std::collections::HashMap;
 use std::path::Path;
+use std::sync::mpsc;
 use std::thread;
 
 use crate::word_box::WordBox;
@@ -73,6 +73,11 @@ impl WordBank {
                 break;
             }
             let word = line.trim().to_string(); // remove whitespace and newline
+
+            if word.chars().any(|c| !c.is_alphabetic()) {
+                line.clear();
+                continue; // skip words with non-alphabetic characters
+            }
 
             let char_count = word.chars().count();
 
