@@ -57,6 +57,17 @@ average
 related
 ```
 
+#### 7x7 
+```
+cabinet
+adenoma
+beckman
+inkling
+nominal
+emanate
+tangles
+```
+
 Usable word banks are in [data](/data/) (a smaller dataset of common words, scrabble dictionary, and full english word list) 
 
 Output files are in [output](/output/) with run stats in [runs.csv](/runs.csv)
